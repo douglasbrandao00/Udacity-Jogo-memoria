@@ -5,6 +5,40 @@
 /******************* FUNÇÕES **********************
 **************************************************/
 
+// INCREMENTA O Tempo
+
+let incrementar = (numero) => {
+  numero++;
+  return numero;
+}
+
+let concatenar = (numero) => {
+  (numero.length === 1)? numero = `0${numero}`
+  : numero = `${numero}`;
+  return numero;
+}
+
+let cronometrar = () => {
+  segundos = String(incrementar(Number(segundos)));
+  segundos = concatenar(segundos);
+  if(Number(segundos) > 59){
+    minutos = String(incrementar(Number(minutos)));
+    minutos = concatenar(minutos);
+    segundos = "00";
+  }
+  cronometro = `${minutos}:${segundos}`;
+  tempo.firstElementChild.textContent = `Tempo: ${cronometro}`;
+}
+
+let contarTempo = () => {
+  ul.removeEventListener('click', contarTempo);
+  intervalo = setInterval(cronometrar, 1000);
+}
+
+let iniciarTempo = () => {
+  segundos = '00', minutos = '00', cronometro = `${minutos}:${segundos}`;
+  tempo.firstElementChild.textContent = `Tempo: ${cronometro}`;
+}
 // Shuffle function from http://stackoverflow.com/a/2450976
 
 let shuffle = (array) => {
@@ -19,7 +53,7 @@ let shuffle = (array) => {
     };
 
     return array;
-};
+}
 
 //CRIA TODOS OS CARDS DO JOGO
 
@@ -34,7 +68,7 @@ let criarCards = (arr) => {
   arr.forEach((card) => {
     card.classList.toggle('card');
   });
-};
+}
 
 //INSERI TODOS OS CARDS CRIADOS NO ELEMENTO DECK
 
@@ -42,14 +76,14 @@ let exibir = () => {
   cards.forEach(card => {
     ul.appendChild(card);
   });
-};
+}
 
 //INCREMENTA O CONTADOR DE MOVIMENTOS
 
 let marcaPonto = () => {
    document.querySelector('.moves').textContent = move;
    gameOver();
-};
+}
 
 //REMOVE TODOS OS EVENTSLISTENERS
 
@@ -57,7 +91,7 @@ let marcaPonto = () => {
    arr.forEach(item => {
        item.removeEventListener('click', mostrar);
    });
- };
+ }
 
 //REMOVER AS CLASSES OPEN E SHOW DOS ELEMENTOS CARDS
 
@@ -68,7 +102,23 @@ let marcaPonto = () => {
 
    });
    adcionarListeners();
- };
+ }
+
+let removerEstrela = () => {
+  if(move === 9) {
+    stars.children[0].firstElementChild.classList.remove('fa-star');
+  } else if (move === 17) {
+    stars.children[1].firstElementChild.classList.remove('fa-star');
+  } else if (move === 25) {
+    stars.children[2].firstElementChild.classList.remove('fa-star');
+  }
+}
+
+let adicionarEstrelas = () => {
+  for (var child of stars.children)  {
+    child.firstElementChild.classList.add('fa-star');
+  }
+}
 
 //VERIFICA SE AS CLASSES DOS ICONES SÃO IGUAIS
 
@@ -80,9 +130,10 @@ let validar = (element1, element2) => {
       element1.parentElement.classList.add('match');
       element2.parentElement.classList.add('match');
    };
+   removerEstrela();
    setTimeout(esconder, 1000);
    marcaPonto();
-};
+}
 
 //ADICIONA AS CLASSES OPEN E SHOW AOS ELEMENTOS CARDS
 
@@ -96,7 +147,7 @@ let mostrar = () => {
     };
     el1 = event.target;
     el1.removeEventListener('click', mostrar);
-};
+}
 
 //ADICIONA EVENTLISTENERS A TODOS OS ELEMENTOS CARD
 
@@ -104,12 +155,14 @@ let adcionarListeners = () => {
   cards.forEach( item => {
     item.addEventListener('click', mostrar);
   });
-};
+}
 
 //FUNÇÃO RESPOSNSAVEL POR INICIALIZAR O JOGO
 
 let init = () => {
   contador = 0, move = 0;
+  ul.addEventListener('click',contarTempo);
+  iniciarTempo();
   shuffle(cards);
   exibir();
   marcaPonto();
@@ -122,8 +175,12 @@ let resetar = () => {
   over.classList.add('not-visible');
   cards.forEach(card => {
     card.classList.remove('match');
-    card.remove()
+    card.classList.remove('open');
+    card.classList.remove('show');
+    card.remove();
   });
+  clearInterval(intervalo);
+  adicionarEstrelas();
   setTimeout(init,100);
 }
 
@@ -137,7 +194,9 @@ let gameOver = () => {
     }
     matchs++;
   }
+
   if(cards.length === matchs ){
+    clearInterval(intervalo);
     points.textContent = `${move}`;
     over.classList.toggle('not-visible');
   }
@@ -167,17 +226,22 @@ let cards = [],
     'fa-bomb'
   ],
  icone,contador,move,matchs,
- el1, el2;
+ el1, el2,
+ segundos, minutos,
+ cronometro, intervalo;
 
-const reset = document.querySelector('.restart');
-const over = document.querySelector('.game-over');
-const poists = document.querySelector('#points');
-const button = document.querySelector('.my-button');
+const reset   = document.querySelector('.restart');
+const over    = document.querySelector('.game-over');
+const poists  = document.querySelector('#points');
+const button  = document.querySelector('.my-button');
+const tempo   = document.querySelector('.temporizador');
+const ul      = document.querySelector('.deck');
+const stars   = document.querySelector('.stars');
 
 button.addEventListener('click', resetar);
 reset.addEventListener('click', resetar);
 
-const ul = document.querySelector('.deck');
+tempo.classList.toggle('not-visible');
 
 criarCards(cards);
 
